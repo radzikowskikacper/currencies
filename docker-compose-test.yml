@@ -1,0 +1,11 @@
+version: '3'
+services:
+  tests:
+    build: .
+    ports:
+      - "8000:8000"
+    links:
+      - "db:database"
+    depends_on:
+      - backend
+    command: ["./wait_for_postgres.sh", "db", "pytest"]

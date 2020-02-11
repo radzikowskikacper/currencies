@@ -1,0 +1,51 @@
+version: '3'
+services:
+  db:
+    image: postgres
+    environment:
+      POSTGRES_USER: currencies
+      POSTGRES_PASSWORD: docker
+    ports:
+      - "5432:5432"
+#     volumes:
+#       - ./currencies_database:/var/lib/postgresql/data
+
+  backend:
+    build: .
+    links:
+      - "db:database"
+    depends_on:
+      - db
+      - redis
+
+  startapp:
+    build: .
+    ports:
+      - "8000:8000"
+    links:
+      - "db:database"
+    depends_on:
+      - backend
+    command: ["./wait_for_postgres.sh", "db", "./init.sh", "8000"]
+
+  redis:
+    image: "redis:alpine"
+
+  celery:
+    build: .
+    command: celery -A currencies worker -l info
+    depends_on:
+      - db
+      - redis
+    links:
+      - "db:database"
+
+  celery-beat:
+    build: .
+    command: celery -A currencies beat -l info
+    depends_on:
+      - db
+      - redis
+
+# volumes:
+#   currencies_database:

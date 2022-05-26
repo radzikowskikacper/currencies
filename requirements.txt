@@ -4,4 +4,4 @@ feedparser==5.2.1
 psycopg2==2.8.4
 pytest-django==3.8.0
 redis==3.2.0
-ujson==1.35
+ujson==5.2.0
